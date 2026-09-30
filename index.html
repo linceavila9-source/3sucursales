@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rosty Pollo a la Leña — Pide por WhatsApp</title>
+<meta name="description" content="Pollo a la leña en Santiago de Veraguas. Elige tu sucursal y pide por WhatsApp.">
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="#inicio" class="brand"><img src="assets/logo.png" alt="Rosty Pollo a la Leña"><span>Rosty Pollo</span></a>
+  <button id="branchChip" class="chip-branch" type="button" aria-label="Cambiar sucursal">
+    <span aria-hidden="true">📍</span><span id="branchChipText">Elegir sucursal</span><span class="chip-branch__change">Cambiar</span>
+  </button>
+  <button id="cartBtn" class="cart-btn" type="button" aria-label="Abrir carrito">
+    🛒 <span id="cartBadge" class="badge" hidden>0</span>
+  </button>
+</header>
+
+<section id="inicio" class="hero">
+  <div>
+    <h1>Pollo a la leña,<br>directo a tu mesa</h1>
+    <p id="heroBranch">Elige tu sucursal para ver el menú y pedir por WhatsApp.</p>
+  </div>
+</section>
+
+<nav class="cat-bar" id="catNav" aria-label="Categorías del menú"></nav>
+
+<main id="menu" class="wrap">
+  <div id="menuRoot"></div>
+</main>
+
+<section id="ubicacion" class="wrap map-section">
+  <h2>Encuentra tu sucursal</h2>
+  <div class="map-grid">
+    <ul id="branchList" class="branch-list"></ul>
+    <div id="map" role="region" aria-label="Mapa de sucursales"></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>© <span id="year"></span> Rosty Pollo a la Leña · Santiago de Veraguas · <a href="https://instagram.com/rostypollosantiago" target="_blank" rel="noopener">@rostypollosantiago</a></p>
+</footer>
+
+<!-- Modal: provincia y sucursal -->
+<div id="locModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="locTitle" hidden>
+  <div class="modal__card">
+    <img src="assets/logo.png" alt="" class="modal__logo">
+    <h2 id="locTitle">¿Dónde quieres pedir?</h2>
+    <label for="provSelect">Provincia</label>
+    <select id="provSelect"></select>
+    <label for="branchSelect">Sucursal</label>
+    <select id="branchSelect" disabled></select>
+    <p id="branchInfo" class="hint"></p>
+    <button id="locConfirm" class="btn" type="button" disabled>Ver menú</button>
+    <button id="locCancel" class="link-btn" type="button" hidden>Cancelar</button>
+  </div>
+</div>
+
+<!-- Carrito + checkout -->
+<div id="overlay" class="overlay" hidden></div>
+<aside id="drawer" class="drawer" aria-label="Tu pedido" aria-hidden="true">
+  <div class="drawer__head">
+    <h2 id="drawerTitle">Tu pedido</h2>
+    <button id="closeDrawer" class="icon-btn" type="button" aria-label="Cerrar">×</button>
+  </div>
+
+  <!-- Vista 1: carrito -->
+  <div id="viewCart" class="drawer__body">
+    <div id="cartItems"></div>
+    <p id="cartEmpty" class="hint center">Tu carrito está vacío. Agrega algo del menú.</p>
+    <div id="totals" class="totals"></div>
+    <button id="clearCart" class="link-btn" type="button">Vaciar carrito</button>
+    <button id="toCheckout" class="btn" type="button" disabled>Continuar con el pedido</button>
+  </div>
+
+  <!-- Vista 2: checkout -->
+  <form id="viewCheckout" class="drawer__body" hidden novalidate>
+    <button id="backToCart" class="link-btn" type="button">← Volver al carrito</button>
+
+    <fieldset>
+      <legend>Tipo de entrega</legend>
+      <div class="seg" id="deliverySeg">
+        <label><input type="radio" name="delivery" value="delivery" checked><span>Delivery</span></label>
+        <label><input type="radio" name="delivery" value="retiro"><span>Retiro en local</span></label>
+      </div>
+    </fieldset>
+
+    <label for="fName">Nombre</label>
+    <input id="fName" type="text" autocomplete="name" required>
+    <label for="fPhone">Teléfono</label>
+    <input id="fPhone" type="tel" autocomplete="tel" required>
+
+    <div id="addrBox">
+      <label for="fAddr">Dirección de entrega</label>
+      <textarea id="fAddr" rows="2" placeholder="Barriada, calle, casa y referencia"></textarea>
+      <button id="gpsBtn" class="btn btn--ghost" type="button">📍 Usar mi ubicación exacta (GPS)</button>
+      <p id="gpsStatus" class="hint" hidden></p>
+    </div>
+
+    <fieldset>
+      <legend>Método de pago</legend>
+      <div class="seg seg--3" id="paySeg">
+        <label><input type="radio" name="pay" value="Efectivo" checked><span>Efectivo</span></label>
+        <label><input type="radio" name="pay" value="Yappy"><span>Yappy</span></label>
+        <label><input type="radio" name="pay" value="Transferencia"><span>Transferencia</span></label>
+      </div>
+    </fieldset>
+
+    <div id="proofBox" hidden>
+      <label for="fRef">Referencia del pago <small>(opcional)</small></label>
+      <input id="fRef" type="text" placeholder="Nº de referencia o confirmación">
+      <label class="check"><input id="fProof" type="checkbox"> Enviaré la captura del comprobante en el chat de WhatsApp</label>
+      <p class="hint">WhatsApp no permite adjuntar imágenes desde una web: cuando se abra el chat, toca 📎 y envía tu captura.</p>
+    </div>
+
+    <label for="fNotes">Notas <small>(opcional)</small></label>
+    <input id="fNotes" type="text" placeholder="Sin ají, poco picante…">
+
+    <div id="checkoutTotals" class="totals"></div>
+    <p id="formError" class="error" role="alert" hidden></p>
+    <button id="sendWA" class="btn btn--wa" type="submit">Enviar pedido por WhatsApp</button>
+  </form>
+</aside>
+
+<div id="toast" class="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
