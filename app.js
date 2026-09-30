@@ -15,11 +15,11 @@
 const PROVINCIAS = [
   { id: "veraguas", nombre: "Veraguas", sucursales: [
     { id: "don-bosco", nombre: "Don Bosco", direccion: "Calle 10, Ave. Don Bosco, Santiago",
-      lat: 8.0952, lng: -80.9836, whatsapp: "50760000001", horario: "10:00 am – 9:00 pm" },
+      lat: 8.0952, lng: -80.9836, whatsapp: "50764163179", horario: "10:00 am – 9:00 pm" },
     { id: "terminal", nombre: "Terminal", direccion: "Frente a Materiales Héctor, Santiago",
-      lat: 8.1040, lng: -80.9792, whatsapp: "50760000002", horario: "10:00 am – 9:00 pm" },
+      lat: 8.1040, lng: -80.9792, whatsapp: "50764163179", horario: "10:00 am – 9:00 pm" },
     { id: "canto-llano", nombre: "Canto del Llano", direccion: "Canto del Llano, Santiago",
-      lat: 8.1148, lng: -80.9868, whatsapp: "50760000003", horario: "10:00 am – 9:00 pm",
+      lat: 8.1148, lng: -80.9868, whatsapp: "50764163179", horario: "10:00 am – 9:00 pm",
       agotados: ["combo-familiar"] }   // ejemplo: producto no disponible en esta sucursal
   ]},
   { id: "cocle", nombre: "Coclé (ejemplo)", sucursales: [
